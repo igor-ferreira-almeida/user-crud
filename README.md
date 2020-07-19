@@ -1,1 +1,5 @@
-# user-crud
+# User Crud
+
+## Swagger integration
+
+https://github.com/swaggo/gin-swagger
