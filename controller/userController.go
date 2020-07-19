@@ -20,6 +20,13 @@ func FindUser(context *gin.Context) {
 	})
 }
 
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Summary Create a new user
+// @Success 200 {object} dto.UserDTO
+// @Router /users [post]
 func CreateUser(context *gin.Context) {
 	userDTO := dto.UserDTO{}
 	context.BindJSON(&userDTO)

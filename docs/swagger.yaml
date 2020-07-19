@@ -1,16 +1,31 @@
-basePath: /
-host: petstore.swagger.io
+definitions:
+  dto.UserDTO:
+    properties:
+      age:
+        type: integer
+      gender:
+        type: string
+      name:
+        type: string
+    type: object
 info:
-  contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
-  description: This is a generic user crud.
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
-  title: User Crud API
-  version: "1.0"
-paths: {}
+  contact: {}
+  license: {}
+paths:
+  /users:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new user
+      tags:
+      - user
 swagger: "2.0"
