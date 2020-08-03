@@ -31,6 +31,9 @@ func CreateUser(context *gin.Context) {
 	userDTO := dto.UserDTO{}
 	context.BindJSON(&userDTO)
 
+	var x = context.Request.Header["X-Discount-Token"]
+	fmt.Println(x)
+
 	bytes, _ := json.Marshal(userDTO)
 	fmt.Println(string(bytes))
 	fmt.Println("-------------------------------")
