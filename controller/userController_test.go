@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/igor-ferreira-almeida/user-crud/dto"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,19 +14,28 @@ import (
 
 func TestFindUser(t *testing.T) {
 	tests := []struct {
-		tag      string
-		expected float64
+		tag            string
+		expectedStatus int
 	}{
 		{
-			tag:      "t1 find exists user",
-			expected: 1.0,
+			tag:            "t1 find exists user",
+			expectedStatus: http.StatusOK,
 		},
 	}
 	for _, test := range tests {
-		result := 1.0
-		if result != test.expected {
-			t.Errorf("TestCreateUser %v failed, expectedStatus %v, got %v", test.tag, test.expected, result)
-		}
+		r := gin.Default()
+		req, _ := http.NewRequest(http.MethodGet, "/users", nil)
+		rr := httptest.NewRecorder()
+		r.GET("/users", FindUser)
+		r.ServeHTTP(rr, req)
+
+		var userDTO dto.UserDTO
+		err := json.Unmarshal(rr.Body.Bytes(), &userDTO)
+
+
+		assert.Nil(t, err)
+		assert.NotNil(t, userDTO)
+		assert.EqualValues(t, test.expectedStatus, rr.Code)
 	}
 
 }
@@ -61,8 +71,11 @@ func TestCreateUser(t *testing.T) {
 
 		fmt.Println(userDTO)
 
-		if status := rr.Code; status != test.expectedStatus {
-			t.Errorf("TestCreateUser %v failed, expectedStatus %v, got %v", test.tag, test.expectedStatus, status)
-		}
+		assert.Nil(t, err)
+		assert.NotNil(t, userDTO)
+		assert.EqualValues(t, test.expectedStatus, rr.Code)
+		assert.EqualValues(t, "Igor", userDTO.Name)
+		assert.EqualValues(t, 31, userDTO.Age)
+		assert.EqualValues(t, "male", userDTO.Gender)
 	}
 }

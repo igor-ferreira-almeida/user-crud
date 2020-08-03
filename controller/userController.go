@@ -15,9 +15,8 @@ func MapUserRoutes(router *gin.Engine) {
 }
 
 func FindUser(context *gin.Context) {
-	context.JSON(http.StatusOK, gin.H{
-		"message": "Person finded!",
-	})
+	userDTO := dto.UserDTO{Name: "name1", Age: 1, Gender: "female"}
+	context.JSON(http.StatusOK, userDTO)
 }
 
 // @Tags user
