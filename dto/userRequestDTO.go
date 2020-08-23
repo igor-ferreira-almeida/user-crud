@@ -2,13 +2,13 @@ package dto
 
 import "github.com/igor-ferreira-almeida/user-crud/domain/usermd"
 
-type UserDTO struct {
+type UserRequestDTO struct {
 	Name   string `json:"name"`
 	Age    int    `json:"age"`
 	Gender string `json:"gender"`
 }
 
-func (dto UserDTO) ToModel() usermd.User {
+func (dto UserRequestDTO) ToModel() usermd.User {
 	return usermd.User{
 		Name: dto.Name,
 		Age: dto.Age,
@@ -16,8 +16,8 @@ func (dto UserDTO) ToModel() usermd.User {
 	}
 }
 
-func NewUserDTO(user usermd.User) UserDTO {
-	return UserDTO{
+func NewUserDTO(user usermd.User) UserRequestDTO {
+	return UserRequestDTO{
 		Name: user.Name,
 		Age: user.Age,
 		Gender: user.Gender,

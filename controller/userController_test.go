@@ -3,8 +3,11 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/igor-ferreira-almeida/user-crud/domain/usermd"
 	"github.com/igor-ferreira-almeida/user-crud/dto"
+	"github.com/igor-ferreira-almeida/user-crud/service/usersvc"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -18,6 +21,34 @@ func TestFindUser(t *testing.T) {
 	FindUser(context)
 
 	assert.EqualValues(t, response.Code, http.StatusOK)
+}
+
+func TestFindUserNotFound(t *testing.T) {
+	response := httptest.NewRecorder()
+	context, _ := gin.CreateTestContext(response)
+
+	context.Params = gin.Params{
+		{Key: "id", Value: "1"},
+	}
+
+	serviceMock := usersvc.UserServiceMock{}
+
+	serviceMock.HandleFindUserFn = func() (usermd.User, error) {
+		return usermd.User{}, errors.New("error executing find")
+	}
+	userService = serviceMock
+
+	FindUser(context)
+
+	var responseDTO dto.ErrorResponseDTO
+	err := json.Unmarshal(response.Body.Bytes(), &responseDTO)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, responseDTO)
+	assert.EqualValues(t, response.Code, http.StatusNotFound)
+	assert.EqualValues(t, responseDTO.HttpStatus, http.StatusText(http.StatusNotFound))
+	assert.EqualValues(t, responseDTO.Code, http.StatusNotFound)
+	assert.EqualValues(t, responseDTO.Message, "User not found")
 }
 
 func TestCreateUser(t *testing.T) {
@@ -71,7 +102,7 @@ func TestUpdateUserBadIdParam(t *testing.T) {
 	context, _ := gin.CreateTestContext(response)
 
 	context.Params = gin.Params{
-		{Key: "id", Value: "adfadsf"},
+		{Key: "id", Value: "a"},
 	}
 	var jsonStr = []byte(`{"name":"Melissa", "age":16, "gender":"female"}`)
 	request, _ := http.NewRequest("PUT", "/users/:id", bytes.NewBuffer(jsonStr))
@@ -88,4 +119,35 @@ func TestUpdateUserBadIdParam(t *testing.T) {
 	assert.EqualValues(t, responseDTO.HttpStatus, http.StatusText(http.StatusBadRequest))
 	assert.EqualValues(t, responseDTO.Code, http.StatusBadRequest)
 	assert.EqualValues(t, responseDTO.Message, "Invalid param for id")
+}
+
+func TestUpdateUserNotFound(t *testing.T) {
+	response := httptest.NewRecorder()
+	context, _ := gin.CreateTestContext(response)
+
+	context.Params = gin.Params{
+		{Key: "id", Value: "2"},
+	}
+	var jsonStr = []byte(`{"name":"Melissa", "age":16, "gender":"female"}`)
+	request, _ := http.NewRequest("PUT", "/users/:id", bytes.NewBuffer(jsonStr))
+	context.Request = request
+
+	serviceMock := usersvc.UserServiceMock{}
+
+	serviceMock.HandleUpdateUserFn = func() (usermd.User, error) {
+		return usermd.User{}, errors.New("error executing updated")
+	}
+	userService = serviceMock
+
+	UpdateUser(context)
+
+	var responseDTO dto.ErrorResponseDTO
+	err := json.Unmarshal(response.Body.Bytes(), &responseDTO)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, responseDTO)
+	assert.EqualValues(t, response.Code, http.StatusNotFound)
+	assert.EqualValues(t, responseDTO.HttpStatus, http.StatusText(http.StatusNotFound))
+	assert.EqualValues(t, responseDTO.Code, http.StatusNotFound)
+	assert.EqualValues(t, responseDTO.Message, "User not found")
 }
