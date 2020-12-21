@@ -20,6 +20,14 @@ func MapUserRoutes(router *gin.Engine) {
 	router.PUT("/users/:id", UpdateUser)
 }
 
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Summary Find user by ID
+// @Param id path string true "User ID"
+// @Success 200 {object} dto.UserResponseDTO
+// @Router /users/{id} [get]
 func FindUser(context *gin.Context) {
 	param := context.Param("id")
 	id, err := strconv.ParseInt(param, 10, 64)
@@ -33,7 +41,7 @@ func FindUser(context *gin.Context) {
 	foundUser, err := userService.Find(id)
 
 	if err != nil {
-		errorResponseDTO := dto.NewErrorResponseDTO(http.StatusText(http.StatusNotFound), http.StatusNotFound, "User not found")
+		errorResponseDTO := dto.NewErrorResponseDTO(http.StatusText(http.StatusNotFound), http.StatusNotFound, err.Error())
 		context.JSON(http.StatusNotFound, errorResponseDTO)
 		return
 	}
@@ -47,7 +55,7 @@ func FindUser(context *gin.Context) {
 // @Produce json
 // @Security ApiKeyAuth
 // @Summary Create a new user
-// @Success 200 {object} dto.UserRequestDTO
+// @Success 201 {object} dto.UserResponseDTO
 // @Router /users [post]
 func CreateUser(context *gin.Context) {
 	userDTO := dto.UserRequestDTO{}
@@ -69,10 +77,12 @@ func CreateUser(context *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Summary Create a new user
-// @Success 200 {object} dto.UserRequestDTO
-// @Router /users [post]
+// @Summary Update user
+// @Param id path string true "User ID"
+// @Success 200 {object} dto.UserResponseDTO
+// @Router /users/{id} [put]
 func UpdateUser(context *gin.Context) {
+	context.Param("x")
 	param := context.Param("id")
 	userDTO := dto.UserRequestDTO{}
 	context.BindJSON(&userDTO)
@@ -89,7 +99,7 @@ func UpdateUser(context *gin.Context) {
 	updatedUser, err := userService.Update(id, user)
 
 	if err != nil {
-		errorResponseDTO := dto.NewErrorResponseDTO(http.StatusText(http.StatusNotFound), http.StatusNotFound, "User not found")
+		errorResponseDTO := dto.NewErrorResponseDTO(http.StatusText(http.StatusNotFound), http.StatusNotFound, err.Error())
 		context.JSON(http.StatusNotFound, errorResponseDTO)
 		return
 	}

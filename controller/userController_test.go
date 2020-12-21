@@ -34,7 +34,7 @@ func TestFindUserNotFound(t *testing.T) {
 	serviceMock := usersvc.UserServiceMock{}
 
 	serviceMock.HandleFindUserFn = func() (usermd.User, error) {
-		return usermd.User{}, errors.New("error executing find")
+		return usermd.User{}, errors.New("user not found")
 	}
 	userService = serviceMock
 
@@ -48,7 +48,7 @@ func TestFindUserNotFound(t *testing.T) {
 	assert.EqualValues(t, response.Code, http.StatusNotFound)
 	assert.EqualValues(t, responseDTO.HttpStatus, http.StatusText(http.StatusNotFound))
 	assert.EqualValues(t, responseDTO.Code, http.StatusNotFound)
-	assert.EqualValues(t, responseDTO.Message, "User not found")
+	assert.EqualValues(t, responseDTO.Message, "user not found")
 }
 
 func TestCreateUser(t *testing.T) {
@@ -129,7 +129,7 @@ func TestUpdateUserNotFound(t *testing.T) {
 		{Key: "id", Value: "2"},
 	}
 	var jsonStr = []byte(`{"name":"Melissa", "age":16, "gender":"female"}`)
-	request, _ := http.NewRequest("PUT", "/users/:id", bytes.NewBuffer(jsonStr))
+	request := httptest.NewRequest("PUT", "/users/:id", bytes.NewBuffer(jsonStr))
 	context.Request = request
 
 	serviceMock := usersvc.UserServiceMock{}

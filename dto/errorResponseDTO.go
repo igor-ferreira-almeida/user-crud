@@ -1,8 +1,8 @@
 package dto
 
 type ErrorResponseDTO struct {
-	HttpStatus string `json: http_status`
-	Code       int    `json: "code"`
+	HttpStatus string `json:"http_status"`
+	Code       int    `json:"code"`
 	Message    string `json:"message"`
 }
 
